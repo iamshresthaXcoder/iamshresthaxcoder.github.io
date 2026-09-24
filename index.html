@@ -659,18 +659,6 @@
     font-family:var(--font-mono);font-size:.68rem;letter-spacing:.26em;
     color:var(--yellow);text-transform:uppercase;margin-bottom:22px;
   }
-  .skill{margin-bottom:18px}
-  .skill:last-child{margin-bottom:0}
-  .skill .row{display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:.72rem;margin-bottom:9px}
-  .skill .row b{color:var(--text);font-weight:400}
-  .skill .row span{color:var(--text-dim)}
-  .bar{height:4px;background:rgba(255,255,255,.06);position:relative;overflow:hidden;border-radius:99px}
-  .bar i{
-    position:absolute;inset:0;transform-origin:left;transform:scaleX(0);
-    background:linear-gradient(90deg,var(--cyan),var(--magenta));
-    transition:transform 1.2s var(--ease);border-radius:99px;
-  }
-  .skill:nth-child(2) .bar i{background:linear-gradient(90deg,var(--yellow),var(--magenta))}
   .chips{display:flex;flex-wrap:wrap;gap:10px}
   .chip{
     font-family:var(--font-mono);font-size:.66rem;padding:8px 15px;
@@ -756,7 +744,6 @@
   @media (prefers-reduced-motion: reduce){
     *{animation:none!important;transition:none!important}
     .reveal{opacity:1;transform:none}
-    .bar i{transform:none}
   }
 </style>
 <style>:root{
@@ -1109,17 +1096,21 @@
     <div class="skills-grid">
       <div class="skill-card reveal d1">
         <h3>// Core</h3>
-        <div class="skill"><div class="row"><b>HTML / CSS</b><span>80%</span></div><div class="bar"><i data-w="80"></i></div></div>
-        <div class="skill"><div class="row"><b>JavaScript</b><span>70%</span></div><div class="bar"><i data-w="70"></i></div></div>
-        <div class="skill"><div class="row"><b>React</b><span>75%</span></div><div class="bar"><i data-w="75"></i></div></div>
-        <div class="skill"><div class="row"><b>UI / UX Design</b><span>80%</span></div><div class="bar"><i data-w="80"></i></div></div>
+        <div class="chips">
+          <span class="chip">HTML / CSS</span>
+          <span class="chip">JavaScript</span>
+          <span class="chip">React</span>
+          <span class="chip">UI / UX Design</span>
+        </div>
       </div>
       <div class="skill-card reveal d2">
         <h3>// AI & Backend</h3>
-        <div class="skill"><div class="row"><b>Prompt Engineering</b><span>70%</span></div><div class="bar"><i data-w="70"></i></div></div>
-        <div class="skill"><div class="row"><b>LLM API Integration</b><span>60%</span></div><div class="bar"><i data-w="60"></i></div></div>
-        <div class="skill"><div class="row"><b>Python</b><span>40%</span></div><div class="bar"><i data-w="40"></i></div></div>
-        <div class="skill"><div class="row"><b>Node.js</b><span>65%</span></div><div class="bar"><i data-w="65"></i></div></div>
+        <div class="chips">
+          <span class="chip">Prompt Engineering</span>
+          <span class="chip">LLM API Integration</span>
+          <span class="chip">Python</span>
+          <span class="chip">Node.js</span>
+        </div>
       </div>
       <div class="skill-card reveal d3">
         <h3>// Toolkit</h3>
@@ -1688,10 +1679,6 @@
     entries.forEach(function(e){
       if(e.isIntersecting){
         e.target.classList.add("in");
-        /* skill bars */
-        e.target.querySelectorAll(".bar i").forEach(function(b){
-          b.style.transform = "scaleX(" + (b.dataset.w/100) + ")";
-        });
         /* scramble-decode titles */
         if(!reduced){
           if(e.target.classList.contains("sec-title")) scramble(e.target);
