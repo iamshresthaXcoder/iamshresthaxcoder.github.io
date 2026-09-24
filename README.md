@@ -3,7 +3,7 @@
 My personal portfolio - a neon cyberpunk cinematic experience, built as ONE self-contained HTML file.
 No frameworks. No build step. No external assets - every image, sound and voice clip is embedded.
 
-Live site: https://iamshresthaxcoder.github.io/portfolio/
+Live site: https://iamshresthaxcoder.github.io/
 
 ## What's inside
 
