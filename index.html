@@ -817,6 +817,47 @@
   .rev-del:hover{background:rgba(255,46,91,.12);border-color:rgba(255,46,91,.7)}
   .modal-status{font-family:var(--font-mono);font-size:.52rem;letter-spacing:.18em;color:var(--yellow);text-align:center;margin:2px 0 4px;min-height:1em}
   .rc-you{font-family:var(--font-mono);font-size:.48rem;letter-spacing:.18em;color:#05060c;background:var(--cyan);border-radius:3px;padding:2px 6px;margin-left:8px;vertical-align:1px}
+
+  /* ============ HERO NAME FX v4 (robust neon) ============ */
+  .hero h1{position:relative;perspective:800px}
+  .hero h1 .glitch{transition:transform .25s var(--ease)}
+  .hero h1::after{content:"";position:absolute;left:2%;right:2%;bottom:-12px;height:3px;background:linear-gradient(90deg,transparent,var(--cyan) 30%,var(--magenta) 70%,transparent);background-size:220% 100%;animation:beamPulse 2.4s ease-in-out infinite;border-radius:99px}
+  @keyframes beamPulse{0%,100%{background-position:0% 0;opacity:.2}50%{background-position:100% 0;opacity:1}}
+  .hero h1 .hl{display:inline-block}
+  .hero h1 .hl.pre{opacity:0}
+  .hero h1 .hl.ent{animation:hlEnter .85s cubic-bezier(.18,1.2,.3,1.05) both}
+  .hero h1 .hl.ent:nth-child(even){animation-name:hlEnterR}
+  @keyframes hlEnter{
+    0%{opacity:0;transform:translateX(-160px) rotateY(100deg) scale(.2)}
+    60%{opacity:1;transform:translateX(14px) rotateY(0deg) scale(1.18)}
+    100%{opacity:1;transform:translateX(0) rotateY(0deg) scale(1)}
+  }
+  @keyframes hlEnterR{
+    0%{opacity:0;transform:translateX(160px) rotateY(-100deg) scale(.2)}
+    60%{opacity:1;transform:translateX(-14px) rotateY(0deg) scale(1.18)}
+    100%{opacity:1;transform:translateX(0) rotateY(0deg) scale(1)}
+  }
+  .hero h1 .hl.wave{animation:hlWave 2.6s ease-in-out infinite}
+  @keyframes hlWave{
+    0%,100%{transform:translateY(0);text-shadow:0 0 12px rgba(0,240,255,.75),0 0 36px rgba(0,240,255,.4)}
+    50%{transform:translateY(-16px);text-shadow:0 0 16px rgba(255,46,151,.9),0 0 48px rgba(255,46,151,.55),0 0 96px rgba(255,46,151,.3)}
+  }
+  .hero h1 .hl.hov{animation:hlSpin .6s cubic-bezier(.2,1.4,.4,1) both}
+  @keyframes hlSpin{
+    0%{transform:translateY(0) rotateY(0) scale(1)}
+    40%{transform:translateY(-18px) rotateY(180deg) scale(1.28);text-shadow:0 0 20px #fff,0 0 60px rgba(255,255,255,.6)}
+    100%{transform:translateY(0) rotateY(360deg) scale(1)}
+  }
+  .hero h1 .hl.zap{animation:hlZap .18s steps(2)}
+  @keyframes hlZap{
+    0%{transform:translate(-7px,3px) skewX(-14deg);text-shadow:0 0 18px var(--magenta)}
+    50%{transform:translate(7px,-3px) skewX(10deg);text-shadow:0 0 18px var(--cyan)}
+    100%{transform:translate(0,0)}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .hero h1 .hl, .hero h1 .hl.pre{opacity:1}
+    .hero h1::after{animation:none}
+  }
 </style>
 </head>
 <body>
@@ -3647,6 +3688,98 @@
     }
     var gb = document.getElementById("galBtn");
     if(gb) gb.addEventListener("click", openGallery);
+  })();
+
+  /* ================= HERO NAME FX v4 (robust) ================= */
+  (function(){
+    var g = document.querySelector(".hero h1 .glitch");
+    if(!g) return;
+    var txt = g.textContent;
+    var spans = [];
+    g.textContent = "";
+    for(var i = 0; i < txt.length; i++){
+      var s = document.createElement("span");
+      s.className = "hl pre";
+      s.textContent = txt[i];
+      g.appendChild(s);
+      spans.push({el: s, ch: txt[i]});
+    }
+    var CH = "ABCDEFGHIJKLMNOPQRSTUVWXYZ01<>/#$%&*";
+    var started = false;
+    function go(){
+      if(started) return;
+      started = true;
+      spans.forEach(function(o, i){
+        setTimeout(function(){
+          o.el.classList.remove("pre");
+          o.el.classList.add("ent");
+          var n = 0;
+          var t = setInterval(function(){
+            o.el.textContent = CH.charAt(Math.floor(Math.random() * CH.length));
+            n++;
+            if(n > 3){ clearInterval(t); o.el.textContent = o.ch; }
+          }, 45);
+          setTimeout(function(){
+            o.el.classList.remove("ent");
+            o.el.classList.add("wave");
+            o.el.style.animationDelay = (i * .13) + "s";
+          }, 980);
+        }, i * 95);
+      });
+    }
+    /* fire the entrance as soon as the intro is over - three triggers so one always works */
+    var poll = setInterval(function(){
+      var gr = document.getElementById("greeter");
+      if(gr && (gr.classList.contains("show") || gr.classList.contains("gone"))){
+        clearInterval(poll);
+        setTimeout(go, 150);
+      }
+    }, 250);
+    var gate = document.getElementById("enterGate");
+    if(gate) gate.addEventListener("click", function(){ setTimeout(go, 16200); });
+    setTimeout(function(){ clearInterval(poll); go(); }, 40000);
+    /* random single-letter glitch */
+    setInterval(function(){
+      if(document.hidden || !started) return;
+      var o = spans[Math.floor(Math.random() * spans.length)];
+      o.el.classList.add("zap");
+      setTimeout(function(){ o.el.classList.remove("zap"); o.el.textContent = o.ch; }, 200);
+    }, 2200);
+    /* hover spin + tick */
+    var lastT = 0;
+    function tick(){
+      var now = Date.now();
+      if(now - lastT < 70) return;
+      lastT = now;
+      try{
+        var AC = window.AudioContext || window.webkitAudioContext;
+        if(!AC) return;
+        if(!window.__hlAC){ try{ window.__hlAC = new AC(); }catch(e){ return; } }
+        var ac = window.__hlAC, t = ac.currentTime;
+        var osc = ac.createOscillator(), gn = ac.createGain();
+        osc.type = "square";
+        osc.frequency.value = 700 + Math.random() * 600;
+        gn.gain.setValueAtTime(.02, t);
+        gn.gain.exponentialRampToValueAtTime(.0001, t + .06);
+        osc.connect(gn); gn.connect(ac.destination);
+        osc.start(t); osc.stop(t + .07);
+      }catch(e){}
+    }
+    spans.forEach(function(o){
+      o.el.addEventListener("mouseenter", function(){ o.el.classList.add("hov"); tick(); });
+      o.el.addEventListener("mouseleave", function(){ o.el.classList.remove("hov"); });
+    });
+    /* 3D tilt toward cursor */
+    var hero = document.getElementById("hero");
+    if(hero && !window.matchMedia("(pointer: coarse)").matches){
+      hero.addEventListener("mousemove", function(e){
+        var r = hero.getBoundingClientRect();
+        var dx = (e.clientX - r.left) / r.width - .5;
+        var dy = (e.clientY - r.top) / r.height - .5;
+        g.style.transform = "rotateY(" + (dx * 8) + "deg) rotateX(" + (-dy * 5) + "deg)";
+      });
+      hero.addEventListener("mouseleave", function(){ g.style.transform = ""; });
+    }
   })();
 </script>
 </body>
