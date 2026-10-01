@@ -1,0 +1,37 @@
+name: Deploy app page from release
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag holding the asset'
+        required: true
+      asset:
+        description: 'Asset filename to deploy'
+        required: true
+      path:
+        description: 'Destination path in the repo'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch asset from release
+        run: |
+          mkdir -p "$(dirname "${{ inputs.path }}")"
+          curl -fSL -o "${{ inputs.path }}" "https://github.com/${{ github.repository }}/releases/download/${{ inputs.tag }}/${{ inputs.asset }}"
+          echo "downloaded $(wc -c < "${{ inputs.path }}") bytes to ${{ inputs.path }}"
+
+      - name: Commit to main
+        run: |
+          git config user.name "shrestha-deploy"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A
+          git commit -m "deploy: ${{ inputs.asset }} -> ${{ inputs.path }} (release ${{ inputs.tag }})" || echo "nothing new to commit"
+          git push
