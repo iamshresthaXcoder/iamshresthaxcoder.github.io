@@ -2838,6 +2838,7 @@
     var T0 = performance.now();
     var COLLIDE_AT = 4200, END_AT = 12500;
     var exploded = false, novaT = 0, done = false, parts = [];
+    var grbAng = 0, grbRays = [];   /* gamma-ray burst state */
     var titleSwapped = false;
 
     /* ================= synthesized sound (WebAudio, no files) ================= */
@@ -2969,6 +2970,41 @@
         for(k=0;k<sgains.length;k++) lg.connect(sgains[k].gain);
         lfo.start(s); lfo.stop(t0 + 12.4);
 
+        /* ---- gamma-ray burst: high-energy sizzle + radiation sweep at impact ---- */
+        try{
+          var gb = t0 + 4.2;
+          var gn = ac.createBufferSource(); gn.buffer = nb;
+          var ghf = ac.createBiquadFilter(); ghf.type = "highpass";
+          ghf.frequency.setValueAtTime(2400, gb);
+          ghf.frequency.exponentialRampToValueAtTime(7000, gb + .5);
+          var gng = ac.createGain();
+          gng.gain.setValueAtTime(0, gb);
+          gng.gain.linearRampToValueAtTime(.16, gb + .05);
+          gng.gain.exponentialRampToValueAtTime(.0001, gb + .8);
+          gn.connect(ghf); ghf.connect(gng); gng.connect(master);
+          gn.start(gb); gn.stop(gb + .9);
+          var gs = ac.createOscillator(); gs.type = "sawtooth";
+          gs.frequency.setValueAtTime(1600, gb);
+          gs.frequency.exponentialRampToValueAtTime(9000, gb + .35);
+          var gsg = ac.createGain();
+          gsg.gain.setValueAtTime(.0001, gb);
+          gsg.gain.linearRampToValueAtTime(.07, gb + .04);
+          gsg.gain.exponentialRampToValueAtTime(.0001, gb + .55);
+          gs.connect(gsg); gsg.connect(master);
+          gs.start(gb); gs.stop(gb + .6);
+          [1, 1.5, 2.25].forEach(function(mul, k){
+            var pp = ac.createOscillator(); pp.type = "triangle";
+            pp.frequency.setValueAtTime(2400 * mul, gb + .02 * k);
+            pp.frequency.exponentialRampToValueAtTime(5200 * mul, gb + .18 + .02 * k);
+            var pg = ac.createGain();
+            pg.gain.setValueAtTime(0, gb + .02 * k);
+            pg.gain.linearRampToValueAtTime(.05, gb + .03 + .02 * k);
+            pg.gain.exponentialRampToValueAtTime(.0001, gb + .3 + .02 * k);
+            pp.connect(pg); pg.connect(master);
+            pp.start(gb + .02 * k); pp.stop(gb + .35 + .02 * k);
+          });
+        }catch(e){}
+
         novaAudio = {
           stop: function(){
             try{
@@ -2995,6 +3031,17 @@
     function explode(x, y){
       exploded = true;
       novaT = performance.now();
+      /* ---- gamma-ray burst: twin collimated jets + 150 radiation streaks ---- */
+      grbAng = -0.38 + Math.random() * 0.76;
+      grbRays = [];
+      for(var gi = 0; gi < 150; gi++){
+        grbRays.push({
+          ang: Math.random() * 6.283,
+          v: .75 + Math.random() * 1.75,
+          w: (Math.random() < .22 ? 2.2 : 1) * (Math.max(W, H) / 900),
+          a: .3 + Math.random() * .65
+        });
+      }
       var scale = Math.max(W, H) / 900;
       for(var i=0;i<750;i++){
         var a = Math.random()*6.283;
@@ -3022,7 +3069,7 @@
       if(!titleSwapped){
         titleSwapped = true;
         var tEl = document.getElementById("novaTitle");
-        if(tEl) tEl.textContent = "// SHRESTHA.EXE // SUPERNOVA SURVIVOR";
+        if(tEl) tEl.textContent = "// SHRESTHA.EXE // GAMMA-RAY BURST SURVIVOR";
       }
       var e = 1 - Math.pow(1-np, 3);
       var fs = Math.min(W*.125, H*.24, 148);
@@ -3115,6 +3162,65 @@
           cg.addColorStop(1, "rgba(255,255,255,0)");
           cx.fillStyle = cg;
           cx.beginPath(); cx.arc(CXc, CYc, 120*(1-ft), 0, 6.283); cx.fill();
+        }
+
+        /* ---- gamma-ray burst: flash + twin jets + radial gamma rays ---- */
+        var gt = (now - novaT) / 1000;
+        if(gt < 1.9){
+          var gf = Math.max(0, 1 - gt / 1.9);
+          if(gt < .18){                              /* initial radiation flash */
+            var ff = 1 - gt / .18;
+            cx.fillStyle = "rgba(216,238,255," + (ff * .5) + ")";
+            cx.fillRect(0, 0, W, H);
+          }
+          var jl = Math.max(W, H) * (0.28 + Math.min(gt / 0.55, 1) * 0.85);
+          for(var jj = 0; jj < 2; jj++){             /* the two relativistic jets */
+            var ja = grbAng + (jj ? Math.PI : 0);
+            cx.save();
+            cx.translate(CXc, CYc);
+            cx.rotate(ja);
+            var cjg = cx.createLinearGradient(0, 0, jl, 0);
+            cjg.addColorStop(0, "rgba(255,255,255," + (gf * .34) + ")");
+            cjg.addColorStop(.25, "rgba(178,214,255," + (gf * .2) + ")");
+            cjg.addColorStop(1, "rgba(150,120,255,0)");
+            cx.fillStyle = cjg;
+            cx.beginPath();
+            cx.moveTo(0, 0);
+            cx.lineTo(jl, -jl * .1);
+            cx.lineTo(jl, jl * .1);
+            cx.closePath();
+            cx.fill();
+            var jcg = cx.createLinearGradient(0, 0, jl, 0);
+            jcg.addColorStop(0, "rgba(255,255,255," + (gf * .95) + ")");
+            jcg.addColorStop(.6, "rgba(206,232,255," + (gf * .55) + ")");
+            jcg.addColorStop(1, "rgba(170,150,255,0)");
+            cx.strokeStyle = jcg;
+            cx.lineWidth = Math.max(1.5, 13 * gf);
+            cx.beginPath(); cx.moveTo(0, 0); cx.lineTo(jl, 0); cx.stroke();
+            cx.strokeStyle = "rgba(255,255,255," + (gf * .85) + ")";
+            cx.lineWidth = Math.max(1, 3.5 * gf);
+            cx.beginPath(); cx.moveTo(0, 0); cx.lineTo(jl * .92, 0); cx.stroke();
+            cx.restore();
+          }
+          for(var rj = 0; rj < grbRays.length; rj++){ /* radial gamma streaks */
+            var ry = grbRays[rj];
+            var rl = ry.v * gt * Math.max(W, H) * .62;
+            var ra = gf * ry.a;
+            if(ra <= 0) continue;
+            var rx0 = CXc + Math.cos(ry.ang) * rl * .62;
+            var ry0 = CYc + Math.sin(ry.ang) * rl * .62;
+            var rx1 = CXc + Math.cos(ry.ang) * rl;
+            var ry1 = CYc + Math.sin(ry.ang) * rl;
+            cx.strokeStyle = "rgba(232,244,255," + ra.toFixed(3) + ")";
+            cx.lineWidth = ry.w;
+            cx.beginPath(); cx.moveTo(rx0, ry0); cx.lineTo(rx1, ry1); cx.stroke();
+            cx.strokeStyle = "rgba(168,132,255," + (ra * .5).toFixed(3) + ")";
+            cx.lineWidth = ry.w * 1.8;
+            cx.beginPath();
+            cx.moveTo(rx0 - (rx1 - rx0) * .35, ry0 - (ry1 - ry0) * .35);
+            cx.lineTo(rx1, ry1);
+            cx.stroke();
+          }
         }
 
         /* SHRESTHA reveal (behind particles) */
