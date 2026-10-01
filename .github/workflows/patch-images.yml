@@ -1,0 +1,24 @@
+name: Patch portfolio images
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Apply patch
+        run: python3 tools/patch_images.py
+
+      - name: Commit
+        run: |
+          git config user.name "shrestha-deploy"
+          git config user.email "actions@users.noreply.github.com"
+          git add index.html
+          git commit -m "patch: one image per new project card" || echo "nothing to commit"
+          git push
