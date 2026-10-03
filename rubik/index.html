@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cube Solver — 3×3 Rubik's Cube by SHRESTHA</title>
-<meta name="description" content="A modern 3×3 Rubik's Cube solver. AI-scramble the cube, turn the faces to solve it, and use hints when you get stuck.">
+<meta name="description" content="A modern 3×3 Rubik's Cube you solve by hand. AI-scramble the cube, drag the faces to turn them, and use hints when you get stuck.">
 <meta name="author" content="Shrestha">
 <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTIiIGZpbGw9IiMwYjBlMTQiLz48cmVjdCB4PSI4IiB5PSI4IiB3aWR0aD0iMTQiIGhlaWdodD0iMTQiIHJ4PSIzIiBmaWxsPSIjZmY0ZDRkIi8+PHJlY3QgeD0iMjUiIHk9IjgiIHdpZHRoPSIxNCIgaGVpZ2h0PSIxNCIgcng9IjMiIGZpbGw9IiMyZWNjNzEiLz48cmVjdCB4PSI0MiIgeT0iOCIgd2lkdGg9IjE0IiBoZWlnaHQ9IjE0IiByeD0iMyIgZmlsbD0iIzNiODJmNiIvPjxyZWN0IHg9IjgiIHk9IjI1IiB3aWR0aD0iMTQiIGhlaWdodD0iMTQiIHJ4PSIzIiBmaWxsPSIjZmZkNjBhIi8+PHJlY3QgeD0iMjUiIHk9IjI1IiB3aWR0aD0iMTQiIGhlaWdodD0iMTQiIHJ4PSIzIiBmaWxsPSIjZjdmOWZjIi8+PHJlY3QgeD0iNDIiIHk9IjI1IiB3aWR0aD0iMTQiIGhlaWdodD0iMTQiIHJ4PSIzIiBmaWxsPSIjZmY5ZjFhIi8+PHJlY3QgeD0iOCIgeT0iNDIiIHdpZHRoPSIxNCIgaGVpZ2h0PSIxNCIgcng9IjMiIGZpbGw9IiMzYjgyZjYiLz48cmVjdCB4PSIyNSIgeT0iNDIiIHdpZHRoPSIxNCIgaGVpZ2h0PSIxNCIgcng9IjMiIGZpbGw9IiNmZjRkNGQiLz48cmVjdCB4PSI0MiIgeT0iNDIiIHdpZHRoPSIxNCIgaGVpZ2h0PSIxNCIgcng9IjMiIGZpbGw9IiMyZWNjNzEiLz48L3N2Zz4=">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,9 +12,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#0a0c12; --bg2:#0f131d; --panel:rgba(20,25,38,.72); --panel2:rgba(26,32,48,.9);
+  --bg:#0a0c12; --panel:rgba(20,25,38,.72); --panel2:rgba(26,32,48,.9);
   --line:rgba(255,255,255,.09); --text:#eef2fb; --dim:#9aa3bd;
-  --accent:#5b8cff; --accent2:#8b5cf6; --good:#2ecc71; --warn:#ffd60a; --bad:#ff5470;
+  --accent:#5b8cff; --accent2:#8b5cf6; --good:#2ecc71; --warn:#ffd60a;
   --font:'Space Grotesk',system-ui,sans-serif; --mono:'JetBrains Mono',monospace;
 }
 *{box-sizing:border-box}
@@ -30,8 +30,7 @@ body{
 body::before{
   content:""; position:fixed; inset:0; pointer-events:none; opacity:.5; z-index:0;
   background-image:linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);
-  background-size:46px 46px;
-  mask-image:radial-gradient(circle at 50% 30%,#000,transparent 75%);
+  background-size:46px 46px; mask-image:radial-gradient(circle at 50% 30%,#000,transparent 75%);
 }
 .wrap{position:relative; z-index:1; max-width:1060px; margin:0 auto; padding:22px 18px 60px}
 .top{display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap}
@@ -40,27 +39,22 @@ body::before{
 .brand b{color:var(--accent)}
 .back{font-family:var(--mono); font-size:12px; color:var(--dim); text-decoration:none; border:1px solid var(--line); padding:8px 13px; border-radius:10px; transition:.2s}
 .back:hover{color:var(--text); border-color:var(--accent)}
-
 .hero{text-align:center; margin:26px 0 8px}
 .hero h1{font-size:clamp(28px,5vw,46px); margin:0 0 8px; letter-spacing:-.5px; background:linear-gradient(90deg,#fff,#9fc0ff 60%,#c4a9ff); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent}
-.hero p{color:var(--dim); margin:0 auto; max-width:560px; font-size:15px}
-
+.hero p{color:var(--dim); margin:0 auto; max-width:600px; font-size:15px}
 .board{display:grid; grid-template-columns:1.15fr .85fr; gap:22px; margin-top:24px}
 @media (max-width:820px){ .board{grid-template-columns:1fr} }
-
 .stage{position:relative; border:1px solid var(--line); border-radius:22px; background:linear-gradient(180deg,var(--panel),rgba(12,16,26,.6));
-  backdrop-filter:blur(10px); overflow:hidden; min-height:430px; display:flex; align-items:center; justify-content:center; cursor:grab}
+  backdrop-filter:blur(10px); overflow:hidden; min-height:460px; display:flex; align-items:center; justify-content:center; cursor:grab; touch-action:none}
 .stage:active{cursor:grabbing}
 .stage .glow{position:absolute; width:340px; height:340px; border-radius:50%; background:radial-gradient(circle,rgba(91,140,255,.28),transparent 70%); filter:blur(10px)}
 .scene{width:300px; height:300px; perspective:1500px; position:relative; z-index:2}
-.cube{position:absolute; left:50%; top:50%; width:0; height:0; transform-style:preserve-3d; transform:rotateX(-26deg) rotateY(-36deg); transition:transform .1s linear}
+.cube{position:absolute; left:50%; top:50%; width:0; height:0; transform-style:preserve-3d; transform:rotateX(-26deg) rotateY(-36deg); transition:transform .08s linear}
 .cubie{position:absolute; left:-32px; top:-32px; width:64px; height:64px; transform-style:preserve-3d}
 .face{position:absolute; left:0; top:0; width:64px; height:64px; border-radius:13px; box-shadow:inset 0 0 0 3px #0a0c12, inset 0 2px 10px rgba(255,255,255,.10), 0 0 2px rgba(0,0,0,.6)}
 .turn-group{position:absolute; left:0; top:0; width:0; height:0; transform-style:preserve-3d}
-
 .hint-float{position:absolute; bottom:14px; left:50%; transform:translateX(-50%); z-index:3;
-  font-family:var(--mono); font-size:12px; color:var(--dim); background:rgba(10,14,22,.8); border:1px solid var(--line); padding:7px 14px; border-radius:20px}
-
+  font-family:var(--mono); font-size:11.5px; color:var(--dim); background:rgba(10,14,22,.82); border:1px solid var(--line); padding:7px 14px; border-radius:20px; text-align:center}
 .side{display:flex; flex-direction:column; gap:14px}
 .card{border:1px solid var(--line); border-radius:18px; background:linear-gradient(180deg,var(--panel),rgba(12,16,26,.55)); backdrop-filter:blur(10px); padding:18px}
 .card h3{margin:0 0 12px; font-size:13px; letter-spacing:.14em; text-transform:uppercase; color:var(--dim); font-family:var(--mono)}
@@ -72,7 +66,6 @@ body::before{
 .stat{background:rgba(255,255,255,.03); border:1px solid var(--line); border-radius:12px; padding:11px; text-align:center}
 .stat .n{font-family:var(--mono); font-size:22px; font-weight:700}
 .stat .l{font-size:10.5px; color:var(--dim); letter-spacing:.1em; text-transform:uppercase; margin-top:2px}
-
 .actions{display:flex; gap:10px; flex-wrap:wrap}
 .btn{font-family:var(--font); font-weight:600; font-size:14px; cursor:pointer; border-radius:12px; padding:13px 18px; border:1px solid var(--line);
   background:rgba(255,255,255,.04); color:var(--text); transition:.18s; flex:1; min-width:120px; display:flex; align-items:center; justify-content:center; gap:8px}
@@ -81,15 +74,12 @@ body::before{
 .btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2)); border:none; box-shadow:0 10px 26px -10px var(--accent)}
 .btn-hint{background:linear-gradient(135deg,#ffb020,#ff7a00); border:none; color:#1a1200; box-shadow:0 10px 26px -12px #ff9500}
 .btn-ghost{flex:none}
-
 .keys{display:grid; grid-template-columns:repeat(6,1fr); gap:8px}
 @media (max-width:520px){ .keys{grid-template-columns:repeat(4,1fr)} }
 .key{font-family:var(--mono); font-size:14px; font-weight:700; padding:12px 0; border-radius:11px; border:1px solid var(--line);
   background:rgba(255,255,255,.03); color:var(--text); cursor:pointer; transition:.15s}
 .key:hover{background:rgba(91,140,255,.18); border-color:var(--accent); transform:translateY(-2px)}
 .key.prime{color:var(--dim)}
-.key:active{transform:translateY(0) scale(.97)}
-
 .solved{position:fixed; inset:0; z-index:200; display:none; align-items:center; justify-content:center; background:rgba(6,9,16,.86); backdrop-filter:blur(10px)}
 .solved.open{display:flex; animation:fade .3s}
 .solved-card{text-align:center; border:1px solid var(--line); border-radius:22px; padding:34px 30px; background:linear-gradient(180deg,var(--panel2),rgba(12,16,26,.9)); max-width:380px;
@@ -106,7 +96,7 @@ footer a{color:var(--accent); text-decoration:none}
 
 /* ===== DEV-TOOL LOCKDOWN ===== */
 #devWarn{position:fixed;inset:0;z-index:50000;display:none;align-items:center;justify-content:center;padding:24px;
-  background:radial-gradient(circle at 50% 40%,rgba(30,4,20,.97),rgba(3,4,10,.995));backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);text-align:center;font-family:'JetBrains Mono',monospace}
+  background:radial-gradient(circle at 50% 40%,rgba(30,4,20,.97),rgba(3,4,10,.995));backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);text-align:center;font-family:var(--mono)}
 #devWarn.open{display:flex}
 .devwarn-card{max-width:460px;border:1px solid rgba(255,60,120,.5);border-radius:14px;padding:30px 26px;background:rgba(16,10,22,.96);
   box-shadow:0 0 0 1px rgba(255,60,120,.25),0 30px 80px -30px rgba(255,60,120,.6);color:#eaeaf5}
@@ -114,10 +104,9 @@ footer a{color:var(--accent); text-decoration:none}
 .devwarn-card h3{font-size:21px;margin:6px 0 10px;color:#fff}
 .devwarn-card p{color:#a9aec6;font-size:13.5px;line-height:1.6;margin:0}
 #devToast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);opacity:0;z-index:50001;
-  background:rgba(12,6,16,.97);border:1px solid rgba(255,60,120,.55);color:#ffb8d4;font-family:'JetBrains Mono',monospace;font-size:12.5px;
+  background:rgba(12,6,16,.97);border:1px solid rgba(255,60,120,.55);color:#ffb8d4;font-family:var(--mono);font-size:12.5px;
   padding:10px 18px;border-radius:22px;pointer-events:none;transition:.28s;white-space:nowrap}
 #devToast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-
 </style>
 </head>
 <body>
@@ -129,14 +118,14 @@ footer a{color:var(--accent); text-decoration:none}
 
   <div class="hero">
     <h1>Solve the Cube</h1>
-    <p>Tap <b>AI Scramble</b> and the cube mixes itself. Turn the faces to solve it — get stuck and take a hint.</p>
+    <p>Tap <b>AI Scramble</b> and the cube mixes itself. Then <b>drag any sticker</b> up, down, left or right to turn that layer — just like holding a real cube.</p>
   </div>
 
   <div class="board">
     <div class="stage" id="stage">
       <div class="glow"></div>
       <div class="scene"><div class="cube" id="cube"></div></div>
-      <div class="hint-float">drag to orbit the cube</div>
+      <div class="hint-float" id="hintFloat">drag a sticker to turn a layer &nbsp;·&nbsp; drag the background to orbit</div>
     </div>
 
     <div class="side">
@@ -172,7 +161,7 @@ footer a{color:var(--accent); text-decoration:none}
           <span><i style="background:#2ecc71"></i>F front</span>
           <span><i style="background:#3b82f6"></i>B back</span>
         </div>
-        <div class="legend" style="margin-top:8px"><span>Tip: keyboard <b>U D L R F B</b>, hold <b>Shift</b> for the reverse turn.</span></div>
+        <div class="legend" style="margin-top:8px"><span>Optional: keyboard <b>U D L R F B</b>, hold <b>Shift</b> for the reverse turn.</span></div>
       </div>
     </div>
   </div>
@@ -188,7 +177,6 @@ footer a{color:var(--accent); text-decoration:none}
     <button class="btn btn-primary" id="playAgain">&#127922; Scramble again</button>
   </div>
 </div>
-
 
 <!-- DEV-TOOL WARNING OVERLAY -->
 <div id="devWarn"><div class="devwarn-card"><div class="ic">&#128721;</div><h3>Dev tools disabled</h3><p>Viewing the source of this page is turned off. Close DevTools to continue.</p></div></div>
@@ -206,11 +194,13 @@ const FACET = {
   '+x':'rotateY(90deg) translateZ(32px)', '-x':'rotateY(-90deg) translateZ(32px)',
   '-y':'rotateX(90deg) translateZ(32px)', '+y':'rotateX(-90deg) translateZ(32px)'
 };
-const MOVES = {
-  R:{axis:'x',layer:1,sign:1}, L:{axis:'x',layer:-1,sign:1},
+/* a move = {axis, layer, sign};  layer is -1 / 0 / 1, sign is +1 or -1 */
+const FACEMOVE = {
+  R:{axis:'x',layer:1,sign:1},  L:{axis:'x',layer:-1,sign:1},
   U:{axis:'y',layer:-1,sign:1}, D:{axis:'y',layer:1,sign:1},
-  F:{axis:'z',layer:1,sign:1}, B:{axis:'z',layer:-1,sign:1}
+  F:{axis:'z',layer:1,sign:1},  B:{axis:'z',layer:-1,sign:1}
 };
+const AXIDX = {x:0,y:1,z:2};
 
 function homeColor(h){
   return {
@@ -234,128 +224,122 @@ function matMul(A,B){ const r=[[0,0,0],[0,0,0],[0,0,0]];
   for(let i=0;i<3;i++)for(let j=0;j<3;j++){ let s=0; for(let k=0;k<3;k++) s+=A[i][k]*B[k][j]; r[i][j]=s; } return r; }
 function matVec(M,v){ return [M[0][0]*v[0]+M[0][1]*v[1]+M[0][2]*v[2], M[1][0]*v[0]+M[1][1]*v[1]+M[1][2]*v[2], M[2][0]*v[0]+M[2][1]*v[1]+M[2][2]*v[2]]; }
 function matCss(M){ return 'matrix3d('+M[0][0]+','+M[1][0]+','+M[2][0]+',0,'+M[0][1]+','+M[1][1]+','+M[2][1]+',0,'+M[0][2]+','+M[1][2]+','+M[2][2]+',0,0,0,0,1)'; }
-const IDENT = [[1,0,0],[0,1,0],[0,0,1]];
-const dot = (a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
+const IDENT=[[1,0,0],[0,1,0],[0,0,1]];
+const dot=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
+const cross=(a,b)=>[a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1]*b[0]];
 
-let cubies = [];
-const cubeEl = document.getElementById('cube');
+let cubies=[];
+const cubeEl=document.getElementById('cube');
 
-function updateCubie(c){
-  c.el.style.transform = 'translate3d('+(c.pos[0]*S)+'px,'+(c.pos[1]*S)+'px,'+(c.pos[2]*S)+'px) '+matCss(c.R);
-}
+function updateCubie(c){ c.el.style.transform='translate3d('+(c.pos[0]*S)+'px,'+(c.pos[1]*S)+'px,'+(c.pos[2]*S)+'px) '+matCss(c.R); }
+
 function buildCube(){
   cubeEl.innerHTML=''; cubies=[];
   for(let x=-1;x<=1;x++)for(let y=-1;y<=1;y++)for(let z=-1;z<=1;z++){
     if(x===0&&y===0&&z===0) continue;
     const home=[x,y,z], colors=homeColor(home);
     const el=document.createElement('div'); el.className='cubie';
+    const c={ home:home, pos:[x,y,z], R:IDENT.map(r=>r.slice()), colors:colors, el:el };
     Object.keys(colors).forEach(d=>{
       const f=document.createElement('div'); f.className='face';
-      f.style.background=colors[d]; f.style.transform=FACET[d]; el.appendChild(f);
+      f.style.background=colors[d]; f.style.transform=FACET[d];
+      f.dataset.dir=d; f.__cubie=c; el.appendChild(f);
     });
-    const c={ home:home, pos:[x,y,z], R:IDENT.map(r=>r.slice()), colors:colors, el:el };
     updateCubie(c); cubeEl.appendChild(el); cubies.push(c);
   }
 }
 
 function isSolved(){
   const face={};
-  for(const c of cubies){
-    for(const d in c.colors){
-      const world = matVec(c.R, DIRV[d]);
-      if(dot(c.pos, world) === 1){
-        const key = world.join(',');
-        (face[key] = face[key] || []).push(c.colors[d]);
-      }
-    }
+  for(const c of cubies) for(const d in c.colors){
+    const w=matVec(c.R, DIRV[d]);
+    if(dot(c.pos,w)===1){ const k=w.join(','); (face[k]=face[k]||[]).push(c.colors[d]); }
   }
   for(const k in face){ const a=face[k]; for(const col of a) if(col!==a[0]) return false; }
   return true;
 }
 
 /* ============================================================
-   ANIMATED MOVES
+   VIEW ROTATION  (so drag directions can be projected to screen)
+   ============================================================ */
+let viewRx=-26, viewRy=-36;
+function rotXdeg(v,deg){ const t=deg*Math.PI/180, c=Math.cos(t), s=Math.sin(t);
+  return [v[0], v[1]*c - v[2]*s, v[1]*s + v[2]*c]; }
+function rotYdeg(v,deg){ const t=deg*Math.PI/180, c=Math.cos(t), s=Math.sin(t);
+  return [v[0]*c + v[2]*s, v[1], -v[0]*s + v[2]*c]; }
+function screenDir(v){ const a=rotYdeg(v, viewRy), b=rotXdeg(a, viewRx); return [b[0], b[1]]; }
+
+/* ============================================================
+   ANIMATED TURNS
    ============================================================ */
 let busy=false, queue=[];
-function base(name){ return name.replace("'",""); }
-function isPrime(name){ return name.indexOf("'") > -1; }
-function inv(name){ return isPrime(name) ? base(name) : name+"'"; }
+function labelFor(m){
+  const map={ x:{'1':'R','-1':'L','0':'M'}, y:{'-1':'U','1':'D','0':'E'}, z:{'1':'F','-1':'B','0':'S'} };
+  const L=(map[m.axis]||{})[String(m.layer)] || m.axis.toUpperCase();
+  return L + (m.sign<0 ? "'" : "");
+}
+function inverse(m){ return {axis:m.axis, layer:m.layer, sign:-m.sign}; }
+function sameMove(a,b){ return a.axis===b.axis && a.layer===b.layer && a.sign===b.sign; }
 
-function applyMove(name, animate, done, dur){
-  const b=MOVES[base(name)], sign = b.sign * (isPrime(name)?-1:1), ax=b.axis;
-  const idx = ax==='x'?0:ax==='y'?1:2;
-  const layer = cubies.filter(c=> c.pos[idx]===b.layer);
-  const axv = ax==='x'?'1,0,0':ax==='y'?'0,1,0':'0,0,1';
+function doTurn(m, animate, done){
+  const idx=AXIDX[m.axis], sign=m.sign;
+  const layerCubies=cubies.filter(c=> c.pos[idx]===m.layer);
+  layerCubies.forEach(c=>{ c.pos=rotVec(c.pos, m.axis, sign); c.R=matMul(rotMat(m.axis, sign), c.R); });
 
-  layer.forEach(c=>{ c.pos = rotVec(c.pos, ax, sign); c.R = matMul(rotMat(ax, sign), c.R); });
+  if(!animate){ layerCubies.forEach(updateCubie); if(done) done(); return; }
 
-  if(!animate){ layer.forEach(updateCubie); if(done) done(); return; }
-
+  const axv = m.axis==='x' ? '1,0,0' : m.axis==='y' ? '0,1,0' : '0,0,1';
+  const ms = 220;
   const g=document.createElement('div'); g.className='turn-group'; cubeEl.appendChild(g);
-  layer.forEach(c=> g.appendChild(c.el));
+  layerCubies.forEach(c=> g.appendChild(c.el));
   g.style.transform='rotate3d('+axv+',0deg)';
   void g.offsetWidth;
-  var ms = dur || 260;
   g.style.transition='transform '+(ms/1000)+'s cubic-bezier(.3,.7,.3,1)';
   g.style.transform='rotate3d('+axv+','+(sign*90)+'deg)';
   let finished=false;
   const finish=()=>{
     if(finished) return; finished=true;
-    layer.forEach(c=> cubeEl.appendChild(c.el));
-    g.remove();
-    layer.forEach(updateCubie);
+    layerCubies.forEach(c=> cubeEl.appendChild(c.el));
+    g.remove(); layerCubies.forEach(updateCubie);
     if(done) done();
   };
   g.addEventListener('transitionend', finish);
-  setTimeout(finish, ms + 90);
+  setTimeout(finish, ms+90);
 }
-
-function pump(){
-  if(busy || !queue.length) return;
-  const job = queue.shift();
-  busy = true;
-  applyMove(job.name, true, ()=>{ busy=false; if(job.after) job.after(); pump(); }, job.dur);
-}
-function enqueue(name, after, dur){ queue.push({name:name, after:after, dur:dur}); pump(); }
+function pump(){ if(busy||!queue.length) return; const job=queue.shift(); busy=true;
+  doTurn(job.m, true, ()=>{ busy=false; if(job.after) job.after(); pump(); }); }
+function enqueue(m, after, fast){ if(fast){ queue.push({m:m, after:after}); } else { queue.push({m:m, after:after}); } pump(); }
 
 /* ============================================================
    GAME STATE
    ============================================================ */
 let scrambled=false, moveCount=0, hintsLeft=10, solution=[], startTime=0, timerId=null;
-
 function fmt(t){ const s=Math.floor(t/1000); return Math.floor(s/60)+':'+String(s%60).padStart(2,'0'); }
 function startTimer(){ startTime=Date.now(); clearInterval(timerId); timerId=setInterval(()=>{ document.getElementById('timeN').textContent=fmt(Date.now()-startTime); },250); }
 function stopTimer(){ clearInterval(timerId); }
-
-function setStatus(html, color){
-  document.getElementById('statusText').innerHTML = html;
-  document.getElementById('statusDot').style.background = color || 'var(--accent)';
-  document.getElementById('statusDot').style.boxShadow = '0 0 12px '+(color || 'var(--accent)');
-}
+function setStatus(html,color){ document.getElementById('statusText').innerHTML=html;
+  document.getElementById('statusDot').style.background=color||'var(--accent)';
+  document.getElementById('statusDot').style.boxShadow='0 0 12px '+(color||'var(--accent)'); }
 function refreshStats(){
-  document.getElementById('moves').textContent = moveCount;
-  document.getElementById('hintCount').textContent = hintsLeft;
-  document.getElementById('hintBtn').disabled = !(scrambled && hintsLeft>0 && !isSolved());
-  document.getElementById('hintBtn').innerHTML = '&#128161; Hint ('+hintsLeft+')';
+  document.getElementById('moves').textContent=moveCount;
+  document.getElementById('hintCount').textContent=hintsLeft;
+  document.getElementById('hintBtn').disabled=!(scrambled && hintsLeft>0 && !isSolved());
+  document.getElementById('hintBtn').innerHTML='&#128161; Hint ('+hintsLeft+')';
 }
-
-function userMove(name){
+function userMove(m){
   moveCount++;
-  if(solution.length && solution[0]===name) solution.shift();
-  else solution.unshift(inv(name));
+  if(solution.length && sameMove(solution[0],m)) solution.shift(); else solution.unshift(inverse(m));
   refreshStats();
   if(scrambled && isSolved()) win();
 }
-
 function win(){
   scrambled=false; stopTimer();
-  document.getElementById('solvedMsg').textContent = 'Solved in '+moveCount+' moves and '+fmt(Date.now()-startTime)+'.';
+  document.getElementById('solvedMsg').textContent='Solved in '+moveCount+' moves and '+fmt(Date.now()-startTime)+'.';
   document.getElementById('solvedOverlay').classList.add('open');
-  setStatus('<b>Solved!</b> Beautifully done. &#127881;', 'var(--good)');
+  setStatus('<b>Solved!</b> Beautifully done. &#127881;','var(--good)');
   refreshStats();
 }
 
-/* scramble — the app "AI" mixes it, and we keep the reverse as a valid solution */
 const FACE_KEYS=['R','L','U','D','F','B'];
 function scramble(){
   if(busy) return;
@@ -363,86 +347,112 @@ function scramble(){
   resetCube(true);
   const moves=[]; let last=null;
   for(let i=0;i<20;i++){ let f; do{ f=FACE_KEYS[Math.floor(Math.random()*6)]; }while(f===last); last=f;
-    moves.push(f + (Math.random()<0.5 ? '' : "'")); }
-  solution = moves.slice().reverse().map(inv);
+    const m=FACEMOVE[f]; moves.push({axis:m.axis, layer:m.layer, sign:(Math.random()<0.5?1:-1)}); }
+  solution = moves.slice().reverse().map(inverse);
   moveCount=0; hintsLeft=10; scrambled=false;
-  setStatus('&#129302; AI is scrambling the cube...', 'var(--accent2)');
+  setStatus('&#129302; AI is scrambling the cube...','var(--accent2)');
   refreshStats();
-  moves.forEach(m=> enqueue(m, null, 85));
-  const wait=setInterval(()=>{
-    if(!busy && queue.length===0){
-      clearInterval(wait);
-      scrambled=true; moveCount=0;
-      setStatus('Cube scrambled. <b>Now solve it!</b> Turn the faces below.', 'var(--warn)');
-      startTimer(); refreshStats();
-    }
-  }, 80);
+  moves.forEach(m=> enqueue(m));
+  const wait=setInterval(()=>{ if(!busy && queue.length===0){ clearInterval(wait);
+    scrambled=true; moveCount=0;
+    setStatus('Cube scrambled. <b>Now solve it!</b> Drag the stickers to turn the layers.','var(--warn)');
+    startTimer(); refreshStats(); } }, 70);
 }
-
 function hint(){
   if(!scrambled || hintsLeft<=0 || busy || !solution.length) return;
   hintsLeft--;
-  const m = solution[0];
-  enqueue(m, ()=>{
-    // the applied move is solution[0] -> consume it
-    if(solution.length && solution[0]===m) solution.shift();
-    if(scrambled && isSolved()) win();
-    refreshStats();
-  });
-  setStatus('&#128161; Hint applied: <b>'+m+'</b> — keep going!', 'var(--warn)');
+  const m=solution[0];
+  enqueue(m, ()=>{ if(solution.length && sameMove(solution[0],m)) solution.shift();
+    if(scrambled && isSolved()) win(); refreshStats(); });
+  setStatus('&#128161; Hint applied: <b>'+labelFor(m)+'</b> — keep going!','var(--warn)');
   refreshStats();
 }
-
 function resetCube(silent){
-  busy=false; queue=[]; stopTimer();
-  buildCube();
+  busy=false; queue=[]; stopTimer(); buildCube();
   moveCount=0; hintsLeft=10; solution=[]; scrambled=false;
   document.getElementById('timeN').textContent='0:00';
   document.getElementById('solvedOverlay').classList.remove('open');
-  if(!silent) setStatus('Cube reset. Tap <b>AI Scramble</b> to begin.', 'var(--accent)');
+  if(!silent) setStatus('Cube reset. Tap <b>AI Scramble</b> to begin.','var(--accent)');
   refreshStats();
 }
 
 /* ============================================================
-   CONTROLS
+   DRAG-TO-TURN  +  ORBIT
    ============================================================ */
-const keysEl = document.getElementById('keys');
+function computeDragMove(cubie, localDir, dx, dy){
+  const n = matVec(cubie.R, DIRV[localDir]);           // world normal of the touched sticker
+  const axes=[[1,0,0],[0,1,0],[0,0,1]];
+  let best=null, bestAbs=0;
+  for(const t of axes){
+    if(Math.abs(dot(t,n))>0.5) continue;               // skip the axis parallel to the normal
+    const s=screenDir(t);
+    const align=s[0]*dx + s[1]*dy;
+    if(Math.abs(align)>bestAbs){ bestAbs=Math.abs(align); best={t:t, s:align>0?1:-1}; }
+  }
+  if(!best) return null;
+  const t=[best.t[0]*best.s, best.t[1]*best.s, best.t[2]*best.s];
+  const a=cross(n,t);                                   // rotation axis
+  const idx=Math.abs(a[0])>0.5?0:(Math.abs(a[1])>0.5?1:2);
+  const axis=['x','y','z'][idx];
+  const sign=a[idx]>0?1:-1;
+  return {axis:axis, layer:cubie.pos[idx], sign:sign};
+}
+
+(function(){
+  const stage=document.getElementById('stage');
+  let drag=null;
+  stage.addEventListener('pointerdown', e=>{
+    const face=e.target.closest ? e.target.closest('.face') : null;
+    try{ stage.setPointerCapture(e.pointerId); }catch(err){}
+    if(face && face.__cubie && scrambled && !busy){
+      drag={mode:'turn', x:e.clientX, y:e.clientY, cubie:face.__cubie, dir:face.dataset.dir, fired:false};
+    } else {
+      drag={mode:'orbit', x:e.clientX, y:e.clientY};
+    }
+  });
+  stage.addEventListener('pointermove', e=>{
+    if(!drag) return;
+    if(drag.mode==='orbit'){
+      viewRy += (e.clientX-drag.x)*0.4;
+      viewRx -= (e.clientY-drag.y)*0.4;
+      viewRx=Math.max(-80,Math.min(80,viewRx));
+      cubeEl.style.transform='rotateX('+viewRx+'deg) rotateY('+viewRy+'deg)';
+      drag.x=e.clientX; drag.y=e.clientY;
+      return;
+    }
+    if(drag.fired) return;
+    const dx=e.clientX-drag.x, dy=e.clientY-drag.y;
+    if(Math.sqrt(dx*dx+dy*dy) < 16) return;
+    const m=computeDragMove(drag.cubie, drag.dir, dx, dy);
+    if(m){ drag.fired=true; enqueue(m, ()=>userMove(m)); }
+  });
+  stage.addEventListener('pointerup', ()=>{ drag=null; });
+  stage.addEventListener('pointercancel', ()=>{ drag=null; });
+})();
+
+/* ============================================================
+   FACE BUTTONS + KEYBOARD (optional extras)
+   ============================================================ */
+const keysEl=document.getElementById('keys');
 ['U',"U'",'D',"D'",'L',"L'",'R',"R'",'F',"F'",'B',"B'"].forEach(k=>{
+  const prime=k.indexOf("'")>-1, f=FACEMOVE[k.replace("'","")];
+  const m={axis:f.axis, layer:f.layer, sign: f.sign*(prime?-1:1)};
   const btn=document.createElement('button');
-  btn.className='key'+(k.indexOf("'")>-1?' prime':'');
-  btn.textContent=k;
-  btn.onclick=()=>{ if(scrambled && !busy){ enqueue(k, ()=>userMove(k)); } };
+  btn.className='key'+(prime?' prime':''); btn.textContent=k;
+  btn.onclick=()=>{ if(scrambled && !busy) enqueue(m, ()=>userMove(m)); };
   keysEl.appendChild(btn);
 });
-
-document.getElementById('scrambleBtn').onclick = scramble;
-document.getElementById('hintBtn').onclick = hint;
-document.getElementById('resetBtn').onclick = ()=>resetCube(false);
-document.getElementById('playAgain').onclick = scramble;
-
+document.getElementById('scrambleBtn').onclick=scramble;
+document.getElementById('hintBtn').onclick=hint;
+document.getElementById('resetBtn').onclick=()=>resetCube(false);
+document.getElementById('playAgain').onclick=scramble;
 document.addEventListener('keydown', e=>{
   const k=e.key.toUpperCase();
   if(FACE_KEYS.indexOf(k)>-1 && scrambled && !busy){
-    const name = e.shiftKey ? k+"'" : k;
-    enqueue(name, ()=>userMove(name));
+    const f=FACEMOVE[k]; const m={axis:f.axis, layer:f.layer, sign:f.sign*(e.shiftKey?-1:1)};
+    enqueue(m, ()=>userMove(m));
   }
 });
-
-/* orbit drag */
-(function(){
-  const stage=document.getElementById('stage');
-  let down=false, lx=0, ly=0, rx=-26, ry=-36;
-  stage.addEventListener('pointerdown', e=>{ down=true; lx=e.clientX; ly=e.clientY; stage.setPointerCapture(e.pointerId); });
-  stage.addEventListener('pointermove', e=>{
-    if(!down) return;
-    ry += (e.clientX-lx)*0.4; rx -= (e.clientY-ly)*0.4;
-    rx=Math.max(-80,Math.min(80,rx));
-    cubeEl.style.transform='rotateX('+rx+'deg) rotateY('+ry+'deg)';
-    lx=e.clientX; ly=e.clientY;
-  });
-  stage.addEventListener('pointerup', ()=>{ down=false; });
-  stage.addEventListener('pointercancel', ()=>{ down=false; });
-})();
 
 buildCube();
 refreshStats();
