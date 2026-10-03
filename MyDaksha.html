@@ -2357,6 +2357,35 @@ body.dark .dk-city-box{ background:rgba(15,23,42,.98); }
 .dk-tap-hint{ position:absolute; top:12px; right:12px; z-index:7; background:rgba(10,18,34,.8);
     border:1px solid rgba(255,255,255,.12); color:#94a3b8; font-size:10.5px; padding:6px 11px; border-radius:20px; }
 
+
+/* ==============================================================
+   DAKSHA SUBSCRIBE GATE  (locks app until channel subscribed)
+   ============================================================== */
+#dkGate{position:fixed;inset:0;z-index:20000;display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;
+  background:radial-gradient(circle at 50% 28%,rgba(24,14,32,.97),rgba(5,6,14,.995));backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  font-family:'Courier New',Courier,monospace;animation:dkGateIn .35s ease}
+#dkGate.hide{display:none}
+@keyframes dkGateIn{from{opacity:0}to{opacity:1}}
+.dk-gate-card{width:100%;max-width:430px;background:linear-gradient(165deg,#141020,#0a0812);border:1px solid rgba(255,140,0,.35);
+  border-radius:24px;padding:32px 26px;text-align:center;color:#eaeeff;position:relative;overflow:hidden;
+  box-shadow:0 30px 70px -20px rgba(0,0,0,.92),0 0 44px rgba(255,140,0,.14)}
+.dk-gate-card::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#ff0000,#ff8c00,#00f2fe)}
+.dk-gate-ico{width:78px;height:78px;border-radius:50%;margin:0 auto 18px;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,#ff0000,#ff8c00);box-shadow:0 0 34px rgba(255,0,0,.55)}
+.dk-gate-ico .material-icons{font-size:42px;color:#fff}
+.dk-gate-card h2{margin:0 0 9px;font-size:23px;color:#fff;letter-spacing:.4px}
+.dk-gate-card p{margin:0 0 22px;font-size:13.5px;color:#b9c0d4;line-height:1.6}
+.dk-gate-btn{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;padding:14px;border:none;border-radius:14px;
+  cursor:pointer;font-weight:800;font-size:14px;margin-bottom:11px;letter-spacing:.4px;font-family:inherit;transition:.2s}
+.dk-gate-sub{background:linear-gradient(135deg,#ff0000,#ff5c00);color:#fff;box-shadow:0 0 24px rgba(255,0,0,.5)}
+.dk-gate-sub:hover{transform:translateY(-2px);box-shadow:0 0 34px rgba(255,0,0,.75)}
+.dk-gate-unlock{background:linear-gradient(135deg,#00f2fe,#4facfe);color:#04121f}
+.dk-gate-unlock:disabled{opacity:.38;cursor:not-allowed;transform:none;box-shadow:none}
+.dk-gate-note{font-size:11px;color:#6b7590;margin-top:4px;letter-spacing:.2px}
+.dk-gate-shake{animation:dkGateShake .4s}
+@keyframes dkGateShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}60%{transform:translateX(8px)}}
+body.dk-locked{overflow:hidden!important}
+
 </style>
 </head>
 
@@ -5704,6 +5733,66 @@ async function dkAiSend(){
         }
     }catch(e){}
 })();
+
+</script>
+
+<!-- ==============================================================
+     DAKSHA SUBSCRIBE GATE  (locks the app until channel subscribed)
+     ============================================================== -->
+<div id="dkGate">
+    <div class="dk-gate-card" id="dkGateCard">
+        <div class="dk-gate-ico"><span class="material-icons">play_arrow</span></div>
+        <h2>Unlock MyDaksha</h2>
+        <p>Subscribe to my channel to unlock every button &amp; feature. The app stays locked until you subscribe.</p>
+        <button class="dk-gate-btn dk-gate-sub" onclick="dkGateSubscribe()"><span class="material-icons" style="font-size:20px">play_circle</span> Subscribe on YouTube</button>
+        <button class="dk-gate-btn dk-gate-unlock" id="dkGateUnlockBtn" onclick="dkGateUnlock()" disabled>I&#39;ve subscribed &mdash; Unlock</button>
+        <div class="dk-gate-note" id="dkGateNote">Step 1: tap Subscribe. &nbsp;Step 2: come back and tap Unlock.</div>
+    </div>
+</div>
+
+<script>
+
+/* ==============================================================
+   DAKSHA SUBSCRIBE GATE — config + logic
+   >>> REPLACE "YOUR_HANDLE" below with your YouTube handle. <<<
+   ============================================================== */
+const DAKSHA_YT_CHANNEL = "https://www.youtube.com/@Shresthagamer07?sub_confirmation=1";
+
+(function dkGateInit(){
+    try{
+        if(localStorage.getItem("dakshaUnlocked") === "1"){
+            var g = document.getElementById("dkGate");
+            if(g) g.classList.add("hide");
+            return;
+        }
+    }catch(e){}
+    document.body.classList.add("dk-locked");
+})();
+
+var dkGateVisited = false;
+
+function dkGateSubscribe(){
+    window.open(DAKSHA_YT_CHANNEL, "_blank");
+    dkGateVisited = true;
+    var b = document.getElementById("dkGateUnlockBtn");
+    if(b){ b.disabled = false; b.style.boxShadow = "0 0 22px rgba(0,242,254,.45)"; }
+    var n = document.getElementById("dkGateNote");
+    if(n) n.innerHTML = "Nice &mdash; now tap <b>&ldquo;I&rsquo;ve subscribed&rdquo;</b> to unlock.";
+}
+
+function dkGateUnlock(){
+    var card = document.getElementById("dkGateCard");
+    if(!dkGateVisited){
+        if(card){ card.classList.remove("dk-gate-shake"); void card.offsetWidth; card.classList.add("dk-gate-shake"); }
+        var n = document.getElementById("dkGateNote");
+        if(n) n.innerHTML = "Open the channel first (tap Subscribe), then unlock.";
+        return;
+    }
+    try{ localStorage.setItem("dakshaUnlocked", "1"); }catch(e){}
+    document.body.classList.remove("dk-locked");
+    var g = document.getElementById("dkGate");
+    if(g) g.classList.add("hide");
+}
 
 </script>
 </body>
