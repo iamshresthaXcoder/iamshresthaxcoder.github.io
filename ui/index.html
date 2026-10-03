@@ -290,6 +290,22 @@ footer a{color:var(--cyan)}
 .cg-close{position:absolute;top:12px;right:14px;cursor:pointer;color:var(--text-dim);font-size:14px}
 .cg-close:hover{color:var(--magenta)}
 
+
+/* ===== CYBER/UI : DEV-TOOL LOCKDOWN ===== */
+#cyberDevWarn{position:fixed;inset:0;z-index:5000;display:none;align-items:center;justify-content:center;padding:24px;
+  background:radial-gradient(circle at 50% 40%,rgba(30,4,20,.97),rgba(3,4,10,.995));backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);text-align:center}
+#cyberDevWarn.open{display:flex;animation:fade .2s}
+.cyber-dev-card{max-width:450px;border:1px solid rgba(255,46,151,.45);border-radius:14px;padding:30px 26px;background:var(--surface-2);
+  box-shadow:0 0 0 1px rgba(255,46,151,.2),0 30px 80px -30px rgba(255,46,151,.6)}
+.cyber-dev-card .ic{font-size:44px;margin-bottom:10px}
+.cyber-dev-card h3{font-size:22px;margin:6px 0 10px;color:#fff}
+.cyber-dev-card p{color:var(--text-dim);font-size:13.5px;line-height:1.6;margin:0 0 8px}
+.cyber-dev-card code{font-family:var(--font-mono);color:var(--cyan);font-size:12.5px}
+#cyberToast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);opacity:0;z-index:6000;
+  background:rgba(10,4,14,.96);border:1px solid rgba(255,46,151,.5);color:#ffb8dc;font-family:var(--font-mono);font-size:12.5px;
+  padding:10px 18px;border-radius:22px;pointer-events:none;transition:.28s;white-space:nowrap}
+#cyberToast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
 </style>
 </head>
 <body>
@@ -843,6 +859,76 @@ function cyberBuildLocks(){
 }
 
 document.addEventListener("DOMContentLoaded", cyberBuildLocks);
+
+</script>
+
+<!-- ===== CYBER/UI : DEV-TOOL WARNING OVERLAY ===== -->
+<div id="cyberDevWarn">
+    <div class="cyber-dev-card">
+        <div class="ic">&#128721;</div>
+        <h3>Dev tools disabled</h3>
+        <p>Viewing this page's source is turned off in the CYBER/UI Kit. Close DevTools to keep browsing components.</p>
+        <p>Want the code of a component? Use the <code>Get code</code> button &mdash; it unlocks the real markup after you subscribe.</p>
+    </div>
+</div>
+<div id="cyberToast"></div>
+
+<script>
+
+/* ==============================================================
+   CYBER/UI — DEV-TOOL LOCKDOWN
+   Blocks right-click, F12, Ctrl/Cmd+U, Ctrl/Cmd+Shift+I/J/C/K,
+   Ctrl/Cmd+S, and warns when DevTools is detected open.
+   (Client-side only — a determined user can still bypass it.)
+   ============================================================== */
+(function(){
+    function warn(msg){
+        var t = document.getElementById("cyberToast");
+        if(!t) return;
+        t.textContent = msg || "Dev tools are disabled in this kit.";
+        t.classList.add("show");
+        clearTimeout(t._t);
+        t._t = setTimeout(function(){ t.classList.remove("show"); }, 1900);
+    }
+
+    /* right click */
+    document.addEventListener("contextmenu", function(e){
+        e.preventDefault();
+        warn("Right-click is disabled here.");
+        return false;
+    }, true);
+
+    /* keyboard shortcuts */
+    document.addEventListener("keydown", function(e){
+        var k = (e.key || "").toUpperCase();
+        var mod = e.ctrlKey || e.metaKey;
+        var blocked = false, why = "";
+        if(e.key === "F12"){ blocked = true; why = "F12 is disabled."; }
+        else if(mod && e.shiftKey && ["I","J","C","K"].indexOf(k) > -1){ blocked = true; why = "That shortcut is disabled."; }
+        else if(mod && ["U","S"].indexOf(k) > -1){ blocked = true; why = (k === "U" ? "View-source is disabled." : "Saving the page is disabled."); }
+        if(blocked){ e.preventDefault(); e.stopPropagation(); warn(why); return false; }
+    }, true);
+
+    /* DevTools detection: window-size delta + debugger timing */
+    var devOpen = false;
+    function showDev(){
+        if(devOpen) return;
+        devOpen = true;
+        var w = document.getElementById("cyberDevWarn");
+        if(w) w.classList.add("open");
+    }
+    function checkSize(){
+        var dw = window.outerWidth - window.innerWidth;
+        var dh = window.outerHeight - window.innerHeight;
+        if(dw > 170 || dh > 170) showDev();
+    }
+    setInterval(function(){
+        checkSize();
+        var t = Date.now();
+        try{ (function(){ return false; })["constructor"]("debugger")(); }catch(err){}
+        if(Date.now() - t > 120) showDev();
+    }, 1500);
+})();
 
 </script>
 </body>
