@@ -256,6 +256,40 @@ footer a{color:var(--cyan)}
 .back-home{font-family:var(--font-mono); font-size:12px; color:var(--text-dim)}
 .back-home:hover{color:var(--cyan)}
 @media (max-width:640px){ .navlinks{display:none} .hero{padding:48px 0 24px} }
+
+/* ===== CYBER/UI : CODE LOCK + SUBSCRIBE GATE ===== */
+.code-lockwrap{margin-top:16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.code-lock{font-family:var(--font-mono);font-size:12.5px;letter-spacing:.06em;cursor:pointer;padding:9px 16px;border-radius:6px;
+  border:1px solid var(--magenta);background:var(--magenta-dim);color:var(--magenta);transition:.2s;display:inline-flex;gap:7px;align-items:center}
+.code-lock:hover{background:var(--magenta);color:#fff;transform:translateY(-2px)}
+.code-lock .lk{font-size:13px}
+.code-copy{font-family:var(--font-mono);font-size:12px;cursor:pointer;padding:9px 14px;border-radius:6px;border:1px solid var(--border);background:var(--cyan-dim);color:var(--cyan);display:none}
+.code-copy:hover{border-color:var(--cyan)}
+.code-drawer{display:none;width:100%;margin-top:12px;background:#04060b;border:1px solid var(--border);border-radius:6px;
+  padding:16px;overflow:auto;font-family:var(--font-mono);font-size:12.6px;line-height:1.7;color:#9ff;white-space:pre;max-height:340px}
+.code-drawer.open{display:block;animation:fade .3s}
+
+.cyber-gate{position:fixed;inset:0;z-index:2000;display:none;align-items:center;justify-content:center;padding:20px;
+  background:rgba(3,4,10,.86);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.cyber-gate.open{display:flex;animation:fade .25s}
+.cyber-gate-card{position:relative;width:100%;max-width:430px;background:var(--surface-2);border:1px solid var(--border);
+  border-radius:14px;padding:28px 24px;text-align:center;
+  box-shadow:0 0 0 1px rgba(0,240,255,.15),0 30px 80px -30px rgba(0,240,255,.5);animation:pop .28s var(--ease)}
+.cg-ico{width:66px;height:66px;border-radius:50%;margin:0 auto 14px;display:grid;place-items:center;font-size:30px;
+  background:linear-gradient(135deg,var(--magenta),#ff8c00);box-shadow:0 0 30px rgba(255,46,151,.5)}
+.cg-kicker{font-family:var(--font-mono);font-size:11px;letter-spacing:.24em;color:var(--magenta);text-transform:uppercase}
+.cyber-gate-card h3{font-size:22px;margin:9px 0 8px}
+.cyber-gate-card p{color:var(--text-dim);font-size:13.5px;margin:0 0 20px;line-height:1.6}
+.cg-sub,.cg-unlock{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;padding:13px;border:none;border-radius:8px;
+  cursor:pointer;font-family:var(--font-display);font-weight:700;font-size:14px;letter-spacing:.05em;margin-bottom:10px;transition:.2s;text-transform:uppercase}
+.cg-sub{background:linear-gradient(135deg,#ff0000,#ff5c00);color:#fff;box-shadow:0 0 22px rgba(255,0,0,.45)}
+.cg-sub:hover{transform:translateY(-2px);box-shadow:0 0 34px rgba(255,0,0,.7)}
+.cg-unlock{background:var(--cyan);color:#04121f}
+.cg-unlock:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.cg-note{font-family:var(--font-mono);font-size:11px;color:var(--text-dim);margin-top:4px}
+.cg-close{position:absolute;top:12px;right:14px;cursor:pointer;color:var(--text-dim);font-size:14px}
+.cg-close:hover{color:var(--magenta)}
+
 </style>
 </head>
 <body>
@@ -565,6 +599,251 @@ function fireToast(){
 /* reveal on scroll */
 var io = new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting){ e.target.style.opacity=1; e.target.style.transform='none'; } }); }, {threshold:.12});
 document.querySelectorAll('.block').forEach(function(s){ s.style.opacity=0; s.style.transform='translateY(18px)'; s.style.transition='opacity .6s var(--ease), transform .6s var(--ease)'; io.observe(s); });
+</script>
+
+<!-- ===== CYBER/UI : SUBSCRIBE GATE (unlock component code) ===== -->
+<div class="cyber-gate" id="cyberGate" onclick="if(event.target===this)cyberCloseGate()">
+    <div class="cyber-gate-card">
+        <span class="cg-close" onclick="cyberCloseGate()">&#10005;</span>
+        <div class="cg-ico">&#128274;</div>
+        <div class="cg-kicker">// LOCKED COMPONENT</div>
+        <h3>Unlock the source code</h3>
+        <p>Subscribe to my channel to unlock this component's code &mdash; and every other component in the kit.</p>
+        <button class="cg-sub" onclick="cyberSubscribe()">&#9654; Subscribe on YouTube</button>
+        <button class="cg-unlock" id="cyberUnlockBtn" onclick="cyberUnlock()" disabled>I&#39;ve subscribed &mdash; Unlock code</button>
+        <div class="cg-note" id="cyberNote">Step 1: tap Subscribe. &nbsp;Step 2: come back and Unlock.</div>
+    </div>
+</div>
+
+<script>
+
+/* ==============================================================
+   CYBER/UI — subscribe gate + per-component code unlock
+   >>> channel handle is set once below <<<
+   ============================================================== */
+const CYBER_CHANNEL = "https://www.youtube.com/@Shresthagamer07?sub_confirmation=1";
+
+const CYBER_CODE = {
+  tokens: `/* Design tokens — override these and the whole kit re-themes */
+:root{
+  --bg:#05060c;
+  --text:#eaeeff;      --text-dim:#98a0c0;
+  --cyan:#00f0ff;      --magenta:#ff2e97;   --yellow:#fcee0a;
+  --border:rgba(0,240,255,.14);
+  --surface:rgba(12,15,28,.60);
+  --font-display:'Chakra Petch',sans-serif;
+  --font-body:'Space Grotesk',sans-serif;
+  --font-mono:'JetBrains Mono',monospace;
+}`,
+
+  buttons: `<!-- markup -->
+<button class="btn btn-primary">Primary</button>
+<button class="btn btn-magenta">Magenta</button>
+<button class="btn btn-yellow">Yellow</button>
+<button class="btn btn-ghost">Ghost</button>
+<button class="btn btn-danger">Danger</button>
+<button class="btn btn-glitch">Glitch</button>
+
+/* css */
+.btn{font-family:var(--font-display);font-weight:600;font-size:14px;letter-spacing:.04em;
+  padding:11px 20px;border-radius:6px;border:1px solid var(--border);
+  background:var(--cyan-dim);color:var(--text);cursor:pointer;transition:.2s}
+.btn:hover{transform:translateY(-2px)}
+.btn-primary{background:var(--cyan);color:#04121f;border-color:var(--cyan);box-shadow:0 0 22px -4px var(--cyan)}
+.btn-magenta{background:var(--magenta);color:#fff;border-color:var(--magenta)}
+.btn-yellow{background:var(--yellow);color:#1a1a00;border-color:var(--yellow)}
+.btn-ghost{background:transparent;border-color:var(--border-soft);color:var(--text-dim)}
+.btn-danger{background:transparent;border-color:rgba(255,46,151,.5);color:var(--magenta)}`,
+
+  badges: `<!-- markup -->
+<span class="badge"><span class="pulse"></span>LIVE</span>
+<span class="badge magenta">IN BETA</span>
+<span class="badge yellow">IN DEV</span>
+<span class="badge green">STABLE</span>
+<span class="tag">CSS</span>
+
+/* css */
+.badge{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-mono);
+  font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:4px 10px;
+  border-radius:20px;border:1px solid var(--border);color:var(--cyan);background:var(--cyan-dim)}
+.badge.magenta{color:var(--magenta);border-color:rgba(255,46,151,.4);background:var(--magenta-dim)}
+.badge .pulse{width:7px;height:7px;border-radius:50%;background:currentColor;animation:pulse 1.4s infinite}`,
+
+  forms: `<!-- markup -->
+<input class="input" placeholder="@shrestha">
+<select class="select"><option>Google</option></select>
+<textarea class="textarea" placeholder="Type a transmission..."></textarea>
+
+<label class="switch"><input type="checkbox" checked><span class="track"></span></label>
+<label class="check"><input type="checkbox" checked><span class="box"></span></label>
+<input type="range" min="0" max="100" value="64">
+
+/* css */
+.input,.select,.textarea{width:100%;font-family:var(--font-body);font-size:14px;color:var(--text);
+  background:rgba(0,0,0,.35);border:1px solid var(--border);border-radius:6px;padding:11px 13px;outline:none}
+.input:focus,.textarea:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(0,240,255,.12)}`,
+
+  hud: `<!-- markup -->
+<div class="hud">
+  <span class="corner-tag">CYAN</span>
+  <h3>System Online</h3>
+  <p class="muted">All subsystems nominal.</p>
+</div>
+
+/* css — corner brackets drawn with ::before / ::after */
+.hud{position:relative;background:var(--surface);border:1px solid var(--border);
+  border-radius:6px;padding:20px;backdrop-filter:blur(8px);transition:.25s}
+.hud:hover{transform:translateY(-3px);box-shadow:0 18px 44px -22px rgba(0,240,255,.5)}
+.hud::before,.hud::after{content:"";position:absolute;width:14px;height:14px;border:2px solid var(--cyan)}
+.hud::before{top:-1px;left:-1px;border-right:0;border-bottom:0}
+.hud::after{bottom:-1px;right:-1px;border-left:0;border-top:0}`,
+
+  terminal: `<!-- markup -->
+<div class="terminal">
+  <div class="term-bar"><i class="r"></i><i class="y"></i><i class="g"></i><span>zsh</span></div>
+  <div class="term-body">
+    <div>&#10148; cyber-ui install <span class="dim">--tokens dark</span></div>
+    <div class="dim">&#8594; linking 40 components...</div>
+    <div><span class="c">&#10004; kit ready in 12ms</span></div>
+    <div>&#10148; <span class="cursor"></span></div>
+  </div>
+</div>
+
+/* css */
+.terminal{border:1px solid var(--border);border-radius:6px;overflow:hidden;background:#04060b}
+.term-body{padding:16px;font-family:var(--font-mono);font-size:13px;color:#9ff;line-height:1.75}
+.cursor{display:inline-block;width:8px;height:15px;background:var(--cyan);animation:blink 1s steps(1) infinite}`,
+
+  navigation: `<!-- tabs -->
+<div class="tabs" data-tabs>
+  <div class="tab active" data-tab="t1">Overview</div>
+  <div class="tab" data-tab="t2">Tokens</div>
+</div>
+<div class="tabpane active" id="t1">...</div>
+<div class="tabpane" id="t2">...</div>
+
+<!-- accordion -->
+<div class="acc-item"><div class="acc-head">Question? <span class="pm">+</span></div>
+  <div class="acc-body"><div>Answer.</div></div></div>
+
+/* js */
+document.querySelectorAll('[data-tabs]').forEach(box=>{
+  box.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
+    box.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+  });
+});`,
+
+  data: `<!-- progress -->
+<div class="bar"><i style="width:72%"></i></div>
+
+<!-- loaders -->
+<div class="spinner"></div>
+<div class="dots"><i></i><i></i><i></i></div>
+
+<!-- skeleton -->
+<div class="skel" style="width:60%"></div>
+
+<!-- avatars -->
+<div class="avatar-stack"><div class="avatar">S</div><div class="avatar magenta">A</div></div>
+
+/* css */
+.bar{height:9px;border-radius:20px;background:rgba(255,255,255,.08);overflow:hidden}
+.bar > i{display:block;height:100%;background:linear-gradient(90deg,var(--cyan),var(--magenta))}
+.spinner{width:34px;height:34px;border-radius:50%;border:3px solid rgba(0,240,255,.2);
+  border-top-color:var(--cyan);animation:spin .8s linear infinite}`,
+
+  overlays: `<!-- toast -->
+<div class="toast"><span class="badge">INFO</span>
+  <div><b>Heads up</b><div class="muted">New components added.</div></div></div>
+
+<!-- tooltip -->
+<span class="tooltip">Hover me<span class="tip">I am a tooltip</span></span>
+
+<!-- modal -->
+<div class="modal-back"><div class="modal">...</div></div>
+
+/* css */
+.toast{display:flex;gap:12px;align-items:center;background:var(--surface-2);
+  border:1px solid var(--border);border-left:3px solid var(--cyan);border-radius:6px;padding:13px 15px}
+.tooltip .tip{position:absolute;bottom:130%;opacity:0;transition:.2s}
+.tooltip:hover .tip{opacity:1}`
+};
+
+var cyberVisited = false;
+var cyberPending = null;
+
+function cyberUnlocked(){ try{ return localStorage.getItem("cyberuiUnlocked") === "1"; }catch(e){ return false; } }
+function cyberMarkUnlocked(){ try{ localStorage.setItem("cyberuiUnlocked", "1"); }catch(e){} }
+
+function cyberOpenGate(){ var g = document.getElementById("cyberGate"); if(g) g.classList.add("open"); }
+function cyberCloseGate(){ var g = document.getElementById("cyberGate"); if(g) g.classList.remove("open"); }
+
+function cyberSubscribe(){
+    window.open(CYBER_CHANNEL, "_blank");
+    cyberVisited = true;
+    var b = document.getElementById("cyberUnlockBtn"); if(b){ b.disabled = false; }
+    var n = document.getElementById("cyberNote"); if(n) n.innerHTML = "Nice &mdash; now tap <b>Unlock code</b>.";
+}
+
+function cyberUnlock(){
+    var n = document.getElementById("cyberNote");
+    if(!cyberVisited){ if(n) n.innerHTML = "Open the channel first (tap Subscribe), then unlock."; return; }
+    cyberMarkUnlocked();
+    cyberCloseGate();
+    document.querySelectorAll(".code-lock").forEach(function(b){ b.innerHTML = '<span class="lk">&#128275;</span> Get code'; });
+    if(cyberPending){
+        cyberPending.drawer.classList.add("open");
+        cyberPending.copy.style.display = "inline-block";
+        cyberPending.btn.innerHTML = '<span class="lk">&#128275;</span> Code';
+        cyberPending = null;
+    }
+}
+
+function cyberBuildLocks(){
+    /* hero: unlock-all button */
+    var hc = document.querySelector(".hero-cta");
+    if(hc){
+        var ub = document.createElement("button");
+        ub.className = "btn btn-magenta";
+        ub.innerHTML = '<span class="lk">&#128274;</span> Unlock source code';
+        ub.onclick = function(){
+            if(cyberUnlocked()){ var s = document.getElementById("buttons"); if(s) window.scrollTo({ top: s.offsetTop - 80, behavior:"smooth" }); }
+            else cyberOpenGate();
+        };
+        hc.appendChild(ub);
+    }
+    /* per-section code locks */
+    document.querySelectorAll("section.block").forEach(function(sec){
+        var id = sec.id;
+        if(!CYBER_CODE[id]) return;
+        var host = document.createElement("div"); host.className = "code-lockwrap";
+        var btn = document.createElement("button"); btn.className = "code-lock";
+        btn.innerHTML = '<span class="lk">&#128274;</span> Get code';
+        var copy = document.createElement("button"); copy.className = "code-copy"; copy.textContent = "Copy";
+        var drawer = document.createElement("pre"); drawer.className = "code-drawer"; drawer.textContent = CYBER_CODE[id];
+        copy.onclick = function(){
+            try{ navigator.clipboard.writeText(CYBER_CODE[id]); }catch(e){}
+            copy.textContent = "Copied \u2713";
+            setTimeout(function(){ copy.textContent = "Copy"; }, 1200);
+        };
+        btn.onclick = function(){
+            if(cyberUnlocked()){
+                var open = drawer.classList.toggle("open");
+                copy.style.display = open ? "inline-block" : "none";
+                btn.innerHTML = '<span class="lk">&#128275;</span> ' + (open ? "Hide code" : "Get code");
+            } else {
+                cyberPending = { drawer: drawer, btn: btn, copy: copy };
+                cyberOpenGate();
+            }
+        };
+        host.appendChild(btn); host.appendChild(copy); host.appendChild(drawer);
+        sec.appendChild(host);
+    });
+}
+
+document.addEventListener("DOMContentLoaded", cyberBuildLocks);
+
 </script>
 </body>
 </html>
